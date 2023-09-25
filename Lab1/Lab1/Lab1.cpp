@@ -1,6 +1,8 @@
 #include "Sprite.h"
 #include <Windows.h>
 #include <cmath>
+#include <chrono>
+#include <thread>
 
 Sprite* sprite;
 CenterPoints* centerPoints;
@@ -11,6 +13,16 @@ float pictureWidth = 100.0f;
 float pictureHeight = 61.0f;
 const float SPEED = 1.f;
 const float WHEELSPEED = 15.f;
+
+//To make smooth bouncing
+const int SLEEP_TIME = 100;
+
+const int BOUNCE_DISTANCE = 50;
+const float BOUNCE_MOVEMENT_STEP = 0.5f;
+bool yTop = false;
+bool yBot = false;
+bool xRight = false;
+bool xLeft = false;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -114,7 +126,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR cmdLine, i
 				Y = mouseCoords.y;
 			}
 		}
-		
+
 		//Move by arrows
 		if (GetAsyncKeyState(VK_UP))
 			Y -= SPEED;
@@ -125,20 +137,61 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR cmdLine, i
 		if (GetAsyncKeyState(VK_RIGHT))
 			X += SPEED;
 
+		//All if's below made to bounce sprite of window borders
+		if (yTop) {
+			Y += BOUNCE_MOVEMENT_STEP;
+			std::this_thread::sleep_for(std::chrono::nanoseconds(SLEEP_TIME));
+		}
+
+		if (Y > dimension.top + BOUNCE_DISTANCE) {
+			yTop = false;
+		}
+
+		if (xRight) {
+			X -= BOUNCE_MOVEMENT_STEP;
+			std::this_thread::sleep_for(std::chrono::nanoseconds(SLEEP_TIME));
+		}
+
+		if (X + pictureWidth < dimension.right - BOUNCE_DISTANCE) {
+			xRight = false;
+		}
+
+		if (yBot) {
+			Y -= BOUNCE_MOVEMENT_STEP;
+			std::this_thread::sleep_for(std::chrono::nanoseconds(SLEEP_TIME));
+		}
+
+		if (Y + pictureHeight < dimension.bottom - BOUNCE_DISTANCE) {
+			yBot = false;
+		}
+
+		if (xLeft) {
+			X += BOUNCE_MOVEMENT_STEP;
+			std::this_thread::sleep_for(std::chrono::nanoseconds(SLEEP_TIME));
+		}
+
+		if (X > dimension.left + BOUNCE_DISTANCE) {
+			xLeft = false;
+		}
+
 		//Collisions check
 		if (Y <= dimension.top) {
+			yTop = true;
 			Y = dimension.top;
 			InvalidateRect(winHandle, NULL, FALSE);
 		}
 		if (X + pictureWidth >= dimension.right) {
+			xRight = true;
 			X = dimension.right - pictureWidth;
 			InvalidateRect(winHandle, NULL, FALSE);
 		}
 		if (Y + pictureHeight >= dimension.bottom) {
+			yBot = true;
 			Y = dimension.bottom - pictureHeight;
 			InvalidateRect(winHandle, NULL, FALSE);
 		}
 		if (X <= dimension.left) {
+			xLeft = true;
 			X = dimension.left;
 			InvalidateRect(winHandle, NULL, FALSE);
 		}
