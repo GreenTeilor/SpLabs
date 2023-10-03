@@ -19,11 +19,13 @@ class Sprite
 	BITMAP m_bm;
 	HDC m_spriteDevice;
 	HBITMAP m_image;
+	HBITMAP m_oldImage;
 
 public:
 	Sprite(HWND hwnd, RECT workSpace);
 
 	void draw(HWND hWnd, float X, float Y);
 	CenterPoints* center(float width, float height);
+	~Sprite();
 };
 

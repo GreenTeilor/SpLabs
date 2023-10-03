@@ -49,7 +49,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	//When another process tries to redraw part of the window
 	if (uMsg == WM_PAINT)
 	{
 		sprite->draw(hwnd, X, Y);
@@ -109,6 +108,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR cmdLine, i
 		{
 			//Obtain cursor position
 			GetCursorPos(&mouseCoords);
+
+			//Screen coordinates to client coordinates
 			ScreenToClient(winHandle, &mouseCoords);
 
 			mouseCoords.x += centerPoints->x; mouseCoords.y += centerPoints->y;
