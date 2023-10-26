@@ -9,12 +9,14 @@
 #include <CommCtrl.h>
 #include <mshtmcid.h>
 #include <Windef.h>
+#include "SizeMenu.hpp"
 
 MainActivity::MainActivity() : m_className{ "Lab_2_WNDCLASS" }, m_label{ "Lab 2" }
 {
     try
     {
         registerClass(m_className.c_str());
+        SizeMenu::registerClass("ResizeDLG");
 
 
         m_wndHandle = CreateWindowEx(
@@ -149,6 +151,14 @@ LRESULT MainActivity::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                 {
                     DestroyWindow(m_editHandle);
                     m_edit = false;
+                }
+                SizeMenu resizeDialog(hwnd, "ResizeDLG", "Resize"); 
+                resizeDialog.run();
+
+                if(resizeDialog.resCol && resizeDialog.resRow)
+                {
+                    m_table.resize(resizeDialog.resRow, resizeDialog.resCol);
+                    invalidateRect();
                 }
                 break;
             }

@@ -1,9 +1,11 @@
 #pragma once
 
 #include <Windows.h>
+
 #include <cstdint>
 #include <string>
 #include <exception>
+
 #include "Table.hpp"
 
 
@@ -12,7 +14,7 @@ class MainActivity
 private:
     Table m_table;
     std::string m_fontName{ "Courier new" };
-    int m_fontSize{ 16 };
+    int m_fontSize{ 23 };
     int m_offset{ 0 };
 
     bool m_edit = false;
