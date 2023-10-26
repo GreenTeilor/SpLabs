@@ -44,7 +44,14 @@ MainActivity::MainActivity() : m_className{ "Lab_2_WNDCLASS" }, m_label{ "Lab 2"
 
 MainActivity::MainActivity(std::string filePath) : MainActivity()
 {
-
+    //To remove spaces
+    m_table.resize(3, 5);
+    m_table.setText(std::string(std::istream_iterator<char>(std::ifstream(filePath)), {}));
+    RegisterHotKey(m_wndHandle, 1, MOD_CONTROL, VK_RETURN);
+    
+    //std::ifstream ifs(filePath);
+    //std::string str(std::istreambuf_iterator<char>{ifs}, {});
+    //table.setText(str);
 }
 
 int MainActivity::run()
@@ -94,6 +101,20 @@ LRESULT MainActivity::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 {
     switch (uMsg)
     {  
+        case WM_MOUSEWHEEL:
+        {
+            int prevOffset = m_offset;
+            m_offset += GET_WHEEL_DELTA_WPARAM(wParam);
+            m_offset = min(m_offset, 0);
+            if(m_offset < -m_table.getRect().bottom + 100)
+                m_offset = -m_table.getRect().bottom + 100;
+            if(m_offset != prevOffset)
+            {
+                invalidateRect();
+            }
+
+            break;
+        }
         case WM_CREATE:
         {
             auto hMenu = CreateMenu();
@@ -151,7 +172,9 @@ LRESULT MainActivity::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                                     ANSI_CHARSET, OUT_TT_ONLY_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, m_fontName.c_str());
             
             SelectObject(secHDC, hFont);
+            m_table.calcCellsSize(secHDC);
             FillRect(secHDC, &ps.rcPaint, (HBRUSH) (WHITE_BRUSH));
+            m_table.draw(secHDC, m_offset);
 
             BitBlt(hdc, 0, 0, m_appWidht, m_appHeight, secHDC, 0, 0, SRCCOPY);
 
@@ -183,6 +206,7 @@ LRESULT MainActivity::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         {
             m_appWidht = LOWORD(lParam);
             m_appHeight = HIWORD(lParam);
+            m_table.resize({0, 0, m_appWidht, m_appHeight});
             return 0;
         }
     }
