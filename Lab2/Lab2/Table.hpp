@@ -24,7 +24,7 @@ public:
     inline void resize(RECT clientRect);
     inline void resize(int rows, int cols);
     void resize(int rows, int cols, RECT clientRect);
-    void calcCellsSize(HDC hdc);
+    void calcCellsSize(HDC hdc, int& fontSize);
     RECT getRect() { return m_tableRect; };
     RECT getCellRect(int i, int j);
     std::string& getCellText(int i, int j);

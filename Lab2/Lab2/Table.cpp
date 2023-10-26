@@ -53,8 +53,9 @@ void Table::resize(int rowNum, int colNum, RECT rect)
     resize(rect);
 }
 
-void Table::calcCellsSize(HDC hdc)
+void Table::calcCellsSize(HDC hdc, int& fontSize)
 {
+    fontSize = (m_tableRect.right - m_tableRect.left) / m_cols / 15;
     auto cellWidth = (m_tableRect.right - m_tableRect.left) / m_cols;
     int prevRowH = 0;
     for(int i = 0; i < m_rows; ++i)

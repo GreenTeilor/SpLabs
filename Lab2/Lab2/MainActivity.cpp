@@ -172,7 +172,7 @@ LRESULT MainActivity::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                                     ANSI_CHARSET, OUT_TT_ONLY_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, m_fontName.c_str());
             
             SelectObject(secHDC, hFont);
-            m_table.calcCellsSize(secHDC);
+            m_table.calcCellsSize(secHDC, m_fontSize);
             FillRect(secHDC, &ps.rcPaint, (HBRUSH) (WHITE_BRUSH));
             m_table.draw(secHDC, m_offset);
 
