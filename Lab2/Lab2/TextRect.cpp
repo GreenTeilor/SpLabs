@@ -28,7 +28,7 @@ int TextRect::draw(HDC hdc, RECT& rect) noexcept
     auto fontHeight = tm.tmHeight;
     float fontWidth = tm.tmAveCharWidth;
     fontWidth += 1.05;
-    auto symbInLine = (rect.right - rect.left) / fontWidth - 2;
+    int symbInLine = (rect.right - rect.left) / fontWidth;
     auto lines = m_text.size() / symbInLine;
     for(int i = 0; i <= lines && fontHeight * (i + 1) < (rect.bottom - rect.top); ++i)
     {
