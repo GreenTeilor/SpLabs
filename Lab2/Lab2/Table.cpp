@@ -80,16 +80,6 @@ void Table::calcCellsSize(HDC hdc, int& fontSize)
     resize({m_tableRect.left, m_tableRect.top, m_tableRect.right, prevRowH});
 }
 
-std::string& Table::getCellText(int i, int j)
-{
-    return m_texts[i][j].getStr();
-}
-
-RECT Table::getCellRect(int i, int j)
-{
-    return m_cellsDimensions[i][j];
-}
-
 void Table::draw(HDC hdc, int offset)
 {
     for(int i = 0; i < m_rows; ++i)

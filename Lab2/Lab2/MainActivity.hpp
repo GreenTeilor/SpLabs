@@ -17,8 +17,6 @@ private:
     int m_fontSize{ 23 };
     int m_offset{ 0 };
 
-    bool m_edit = false;
-    HWND m_editHandle = 0;
     std::string* m_cellTextPtr;
 
     HWND m_wndHandle{};

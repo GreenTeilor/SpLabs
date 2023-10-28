@@ -49,7 +49,6 @@ MainActivity::MainActivity(std::string filePath) : MainActivity()
     //To remove spaces
     m_table.resize(3, 5);
     m_table.setText(std::string(std::istream_iterator<char>(std::ifstream(filePath)), {}));
-    RegisterHotKey(m_wndHandle, 1, MOD_CONTROL, VK_RETURN);
     
     //std::ifstream ifs(filePath);
     //std::string str(std::istreambuf_iterator<char>{ifs}, {});
@@ -126,32 +125,12 @@ LRESULT MainActivity::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
             break;
         }
-        case WM_HOTKEY:
-        {
-            if(wParam == 1 && m_edit)
-            {
-                char text[256];
-                GetWindowText(m_editHandle, text, 256);
-                *m_cellTextPtr = text; 
-
-                DestroyWindow(m_editHandle);
-                invalidateRect();
-                m_edit = false;
-            }
-
-            break;
-        }
         case WM_COMMAND:
         {
             switch (wParam)
             {
             case RESIZE:
             {
-                if(m_edit)
-                {
-                    DestroyWindow(m_editHandle);
-                    m_edit = false;
-                }
                 SizeMenu resizeDialog(hwnd, "ResizeDLG", "Resize"); 
                 resizeDialog.run();
 
