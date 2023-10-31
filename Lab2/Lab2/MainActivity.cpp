@@ -131,12 +131,12 @@ LRESULT MainActivity::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             {
             case RESIZE:
             {
-                SizeMenu resizeDialog(hwnd, "ResizeDLG", "Resize"); 
-                resizeDialog.run();
+                SizeMenu sizeMenu(hwnd, "ResizeDLG", "Resize"); 
+                sizeMenu.run();
 
-                if(resizeDialog.resCol && resizeDialog.resRow)
+                if(sizeMenu.resCol && sizeMenu.resRow)
                 {
-                    m_table.resize(resizeDialog.resRow, resizeDialog.resCol);
+                    m_table.resize(sizeMenu.resRow, sizeMenu.resCol);
                     invalidateRect();
                 }
                 break;
