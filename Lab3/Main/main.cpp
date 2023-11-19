@@ -12,6 +12,7 @@ const char* REPLACE_FUNC_NAME = "replaceStringInMemory";
 
 #define TO_REPLACE "Elephant"
 #define REPLACE_STR "Firewall"
+#define DLL_PATH "Dll.dll"
 
 struct Params {
     DWORD pid;
@@ -33,6 +34,10 @@ int main()
     StaticImport(pid);
     std::cout << "String to replace: " << TO_REPLACE << "; New string: " << data1 << "\n";
 
+    std::cout << "Dynamic Import" << "\n";
+    DynamicImport(pid);
+    std::cout << "String to replace: " << REPLACE_STR << "; New string: " << data1 << "\n";
+
     return 0;
 }
 
@@ -41,5 +46,12 @@ void StaticImport(DWORD pid)
     replaceStringInMemory(new Params{pid, TO_REPLACE, REPLACE_STR});
 }
 
+void DynamicImport(DWORD pid)
+{
+    HMODULE dll = LoadLibraryA(DLL_PATH); //Load dll into address space of calling process
+    TReplaceMemoryFunc func = (TReplaceMemoryFunc)GetProcAddress(dll, REPLACE_FUNC_NAME); //Get function address from dll and write into function pointer
+    func(new Params{ pid, REPLACE_STR, TO_REPLACE });
+    FreeLibrary(dll); //Free dll and decrease it's reference counter, if counter equals zero, dll is unloaded from address space of calling process
+}
 
 
