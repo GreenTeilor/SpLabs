@@ -20,7 +20,7 @@ struct Params {
     char replaceStr[256];
 };
 
-extern "C" _declspec(dllimport) void __stdcall replaceStringInMemory(Params* params);
+extern "C" _declspec(dllimport) void __stdcall replaceStringInMemory(Params * params);
 typedef void(__cdecl* TReplaceMemoryFunc)(Params* params); //Used as pointer on function replaceStringInMemory
 
 
@@ -38,12 +38,16 @@ int main()
     DynamicImport(pid);
     std::cout << "String to replace: " << REPLACE_STR << "; New string: " << data1 << "\n";
 
+    std::cout << "Input another process pid: ";
+    DWORD anotherProcessPid;
+    std::cin >> anotherProcessPid;
+    Injection(anotherProcessPid);
     return 0;
 }
 
 void StaticImport(DWORD pid)
 {
-    replaceStringInMemory(new Params{pid, TO_REPLACE, REPLACE_STR});
+    replaceStringInMemory(new Params{ pid, TO_REPLACE, REPLACE_STR });
 }
 
 void DynamicImport(DWORD pid)
@@ -54,4 +58,28 @@ void DynamicImport(DWORD pid)
     FreeLibrary(dll); //Free dll and decrease it's reference counter, if counter equals zero, dll is unloaded from address space of calling process
 }
 
+void Injection(DWORD pid) {
+
+    HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid); //Get access to process with given pid (get process object)
+    LPVOID loadLibPtr = (LPVOID)GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA"); //Get pointer at "LoadLibraryA" from "kernel32.dll"(GetModuleHandle - retrieves module handle)
+
+    LPVOID dllPathPtr = VirtualAllocEx(process, NULL, strlen(DLL_PATH) + 1, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE); //Allocate memory for library name
+    WriteProcessMemory(process, dllPathPtr, DLL_PATH, strlen(DLL_PATH) + 1, NULL); //Write library name in process memory
+
+    HANDLE thread = CreateRemoteThread(process, NULL, 0, (LPTHREAD_START_ROUTINE)loadLibPtr/*Pointer at LoadLibraryA, which loads the dll*/, dllPathPtr, 0, NULL); //Create remote thread
+    WaitForSingleObject(thread, INFINITE);
+    CloseHandle(thread);
+
+    LPVOID replaceFuncPointer = (LPVOID)GetProcAddress(GetModuleHandleA(DLL_PATH), REPLACE_FUNC_NAME); //Get replace function address
+
+    Params params = { pid, TO_REPLACE, REPLACE_STR };
+    LPVOID paramsPtr = VirtualAllocEx(process, NULL, sizeof(params), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE); //Allocate memory for params
+    WriteProcessMemory(process, paramsPtr, &params, sizeof(params), NULL); //Write params into memory
+
+    thread = CreateRemoteThread(process, NULL, 0, (LPTHREAD_START_ROUTINE)replaceFuncPointer, paramsPtr, 0, NULL);
+    WaitForSingleObject(thread, INFINITE);
+    CloseHandle(thread);
+
+    CloseHandle(process);
+}
 
